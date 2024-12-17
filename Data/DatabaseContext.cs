@@ -79,6 +79,46 @@ namespace ProjectManager.Data
             command.Parameters.AddWithValue("@endDate", project.EndDate.ToString("s"));
             
             command.ExecuteNonQuery();
+            
+            // Получаем Id только что созданного проекта
+            command.CommandText = "SELECT last_insert_rowid()";
+            project.Id = Convert.ToInt32(command.ExecuteScalar());
+        }
+
+        public void UpdateProject(Project project)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                UPDATE Projects 
+                SET Name = @name, Description = @description, StartDate = @startDate, EndDate = @endDate
+                WHERE Id = @id";
+            
+            command.Parameters.AddWithValue("@id", project.Id);
+            command.Parameters.AddWithValue("@name", project.Name);
+            command.Parameters.AddWithValue("@description", project.Description);
+            command.Parameters.AddWithValue("@startDate", project.StartDate.ToString("s"));
+            command.Parameters.AddWithValue("@endDate", project.EndDate.ToString("s"));
+            
+            command.ExecuteNonQuery();
+        }
+
+        public void DeleteProject(int projectId)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            // Сначала удаляем все задачи проекта
+            command.CommandText = "DELETE FROM Tasks WHERE ProjectId = @projectId";
+            command.Parameters.AddWithValue("@projectId", projectId);
+            command.ExecuteNonQuery();
+
+            // Затем удаляем сам проект
+            command.CommandText = "DELETE FROM Projects WHERE Id = @projectId";
+            command.ExecuteNonQuery();
         }
 
         // Методы для работы с задачами
@@ -100,6 +140,99 @@ namespace ProjectManager.Data
             command.Parameters.AddWithValue("@projectId", task.ProjectId);
             command.Parameters.AddWithValue("@assignedToId", task.AssignedToId.HasValue ? task.AssignedToId : DBNull.Value);
             
+            command.ExecuteNonQuery();
+            
+            command.CommandText = "SELECT last_insert_rowid()";
+            task.Id = Convert.ToInt32(command.ExecuteScalar());
+        }
+
+        public void UpdateTask(Task task)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                UPDATE Tasks 
+                SET Title = @title, Description = @description, DueDate = @dueDate, 
+                    Status = @status, Priority = @priority, AssignedToId = @assignedToId
+                WHERE Id = @id";
+            
+            command.Parameters.AddWithValue("@id", task.Id);
+            command.Parameters.AddWithValue("@title", task.Title);
+            command.Parameters.AddWithValue("@description", task.Description);
+            command.Parameters.AddWithValue("@dueDate", task.DueDate.ToString("s"));
+            command.Parameters.AddWithValue("@status", (int)task.Status);
+            command.Parameters.AddWithValue("@priority", (int)task.Priority);
+            command.Parameters.AddWithValue("@assignedToId", task.AssignedToId.HasValue ? task.AssignedToId : DBNull.Value);
+            
+            command.ExecuteNonQuery();
+        }
+
+        public void DeleteTask(int taskId)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "DELETE FROM Tasks WHERE Id = @taskId";
+            command.Parameters.AddWithValue("@taskId", taskId);
+            command.ExecuteNonQuery();
+        }
+
+        // Методы для работы с исполнителями
+        public void AddTeamMember(TeamMember member)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                INSERT INTO TeamMembers (Name, Email, Role)
+                VALUES (@name, @email, @role)";
+            
+            command.Parameters.AddWithValue("@name", member.Name);
+            command.Parameters.AddWithValue("@email", member.Email);
+            command.Parameters.AddWithValue("@role", member.Role);
+            
+            command.ExecuteNonQuery();
+            
+            command.CommandText = "SELECT last_insert_rowid()";
+            member.Id = Convert.ToInt32(command.ExecuteScalar());
+        }
+
+        public void UpdateTeamMember(TeamMember member)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                UPDATE TeamMembers 
+                SET Name = @name, Email = @email, Role = @role
+                WHERE Id = @id";
+            
+            command.Parameters.AddWithValue("@id", member.Id);
+            command.Parameters.AddWithValue("@name", member.Name);
+            command.Parameters.AddWithValue("@email", member.Email);
+            command.Parameters.AddWithValue("@role", member.Role);
+            
+            command.ExecuteNonQuery();
+        }
+
+        public void DeleteTeamMember(int memberId)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            // Сначала обновляем задачи, где этот исполнитель назначен
+            command.CommandText = "UPDATE Tasks SET AssignedToId = NULL WHERE AssignedToId = @memberId";
+            command.Parameters.AddWithValue("@memberId", memberId);
+            command.ExecuteNonQuery();
+
+            // Затем удаляем самого исполнителя
+            command.CommandText = "DELETE FROM TeamMembers WHERE Id = @memberId";
             command.ExecuteNonQuery();
         }
 
@@ -129,6 +262,31 @@ namespace ProjectManager.Data
             return projects;
         }
 
+        // Получение всех исполнителей
+        public List<TeamMember> GetAllTeamMembers()
+        {
+            var members = new List<TeamMember>();
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT * FROM TeamMembers";
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                members.Add(new TeamMember
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Email = reader.IsDBNull(2) ? null : reader.GetString(2),
+                    Role = reader.IsDBNull(3) ? null : reader.GetString(3)
+                });
+            }
+
+            return members;
+        }
+
         // Получение задач по проекту
         public List<Task> GetTasksByProject(int projectId)
         {
@@ -137,13 +295,17 @@ namespace ProjectManager.Data
             connection.Open();
 
             var command = connection.CreateCommand();
-            command.CommandText = "SELECT * FROM Tasks WHERE ProjectId = @projectId";
+            command.CommandText = @"
+                SELECT t.*, m.Name as AssigneeName, m.Email as AssigneeEmail, m.Role as AssigneeRole
+                FROM Tasks t
+                LEFT JOIN TeamMembers m ON t.AssignedToId = m.Id
+                WHERE t.ProjectId = @projectId";
             command.Parameters.AddWithValue("@projectId", projectId);
 
             using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                tasks.Add(new Task
+                var task = new Task
                 {
                     Id = reader.GetInt32(0),
                     Title = reader.GetString(1),
@@ -153,7 +315,20 @@ namespace ProjectManager.Data
                     Priority = (TaskPriority)reader.GetInt32(5),
                     ProjectId = reader.GetInt32(6),
                     AssignedToId = reader.IsDBNull(7) ? null : reader.GetInt32(7)
-                });
+                };
+
+                if (!reader.IsDBNull(8)) // Если есть назначенный исполнитель
+                {
+                    task.AssignedTo = new TeamMember
+                    {
+                        Id = task.AssignedToId.Value,
+                        Name = reader.GetString(8),
+                        Email = reader.IsDBNull(9) ? null : reader.GetString(9),
+                        Role = reader.IsDBNull(10) ? null : reader.GetString(10)
+                    };
+                }
+
+                tasks.Add(task);
             }
 
             return tasks;

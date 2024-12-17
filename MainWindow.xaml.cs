@@ -4,10 +4,11 @@ using System.Windows;
 using System.Windows.Controls;
 using ProjectManager.Models;
 using ProjectManager.Data;
+using ProjectManager.Views;
 using Microsoft.Win32;
 using System.IO;
-using CsvHelper;
 using System.Globalization;
+using CsvHelper;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
@@ -39,17 +40,49 @@ namespace ProjectManager
 
         private void CreateProject_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Implement project creation dialog
-            var project = new Project
+            var dialog = new ProjectDialog();
+            if (dialog.ShowDialog() == true)
             {
-                Name = "Новый проект",
-                Description = "Описание проекта",
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now.AddMonths(1)
-            };
+                _dbContext.AddProject(dialog.Project);
+                LoadProjects();
+            }
+        }
 
-            _dbContext.AddProject(project);
-            LoadProjects();
+        private void EditProject_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is Project project)
+            {
+                var dialog = new ProjectDialog(project);
+                if (dialog.ShowDialog() == true)
+                {
+                    _dbContext.UpdateProject(dialog.Project);
+                    LoadProjects();
+                }
+            }
+        }
+
+        private void DeleteProject_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is Project project)
+            {
+                var result = MessageBox.Show(
+                    $"Вы уверены, что хотите удалить проект '{project.Name}'?\nВсе задачи проекта также будут удалены.",
+                    "Подтверждение удаления",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    _dbContext.DeleteProject(project.Id);
+                    LoadProjects();
+                    if (_selectedProject?.Id == project.Id)
+                    {
+                        _selectedProject = null;
+                        ProjectNameText.Text = "Выберите проект";
+                        TasksGrid.ItemsSource = null;
+                    }
+                }
+            }
         }
 
         private void ProjectsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -57,7 +90,13 @@ namespace ProjectManager
             _selectedProject = ProjectsList.SelectedItem as Project;
             if (_selectedProject != null)
             {
+                ProjectNameText.Text = _selectedProject.Name;
                 LoadTasks();
+            }
+            else
+            {
+                ProjectNameText.Text = "Выберите проект";
+                TasksGrid.ItemsSource = null;
             }
         }
 
@@ -74,23 +113,55 @@ namespace ProjectManager
         {
             if (_selectedProject == null)
             {
-                MessageBox.Show("Пожалуйста, выберите проект");
+                MessageBox.Show("Пожалуйста, выберите проект", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // TODO: Implement task creation dialog
-            var task = new Task
+            var dialog = new TaskDialog(_dbContext.GetAllTeamMembers());
+            if (dialog.ShowDialog() == true)
             {
-                Title = "Новая задача",
-                Description = "Описание задачи",
-                DueDate = DateTime.Now.AddDays(7),
-                Status = TaskStatus.Pending,
-                Priority = TaskPriority.Medium,
-                ProjectId = _selectedProject.Id
-            };
+                dialog.Task.ProjectId = _selectedProject.Id;
+                _dbContext.AddTask(dialog.Task);
+                LoadTasks();
+            }
+        }
 
-            _dbContext.AddTask(task);
-            LoadTasks();
+        private void EditTask_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is Task task)
+            {
+                var dialog = new TaskDialog(_dbContext.GetAllTeamMembers(), task);
+                if (dialog.ShowDialog() == true)
+                {
+                    dialog.Task.ProjectId = _selectedProject.Id;
+                    _dbContext.UpdateTask(dialog.Task);
+                    LoadTasks();
+                }
+            }
+        }
+
+        private void DeleteTask_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is Task task)
+            {
+                var result = MessageBox.Show(
+                    $"Вы уверены, что хотите удалить задачу '{task.Title}'?",
+                    "Подтверждение удаления",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    _dbContext.DeleteTask(task.Id);
+                    LoadTasks();
+                }
+            }
+        }
+
+        private void ManageTeamMembers_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new TeamMembersListDialog(_dbContext);
+            dialog.ShowDialog();
         }
 
         private void SortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -113,7 +184,7 @@ namespace ProjectManager
         {
             if (_selectedProject == null || TasksGrid.ItemsSource == null)
             {
-                MessageBox.Show("Нет данных для экспорта");
+                MessageBox.Show("Нет данных для экспорта", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -128,7 +199,7 @@ namespace ProjectManager
                 using var writer = new StreamWriter(saveFileDialog.FileName);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                 csv.WriteRecords(TasksGrid.ItemsSource);
-                MessageBox.Show("Экспорт в CSV выполнен успешно!");
+                MessageBox.Show("Экспорт в CSV выполнен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
@@ -136,7 +207,7 @@ namespace ProjectManager
         {
             if (_selectedProject == null || TasksGrid.ItemsSource == null)
             {
-                MessageBox.Show("Нет данных для экспорта");
+                MessageBox.Show("Нет данных для экспорта", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -173,7 +244,7 @@ namespace ProjectManager
                 }
 
                 document.Add(table);
-                MessageBox.Show("Экспорт в PDF выполнен успешно!");
+                MessageBox.Show("Экспорт в PDF выполнен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }
