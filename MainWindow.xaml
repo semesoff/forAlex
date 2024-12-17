@@ -1,0 +1,63 @@
+<Window x:Class="ProjectManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Project Manager" Height="600" Width="1000">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Левая панель с проектами -->
+        <DockPanel Grid.Column="0" Background="#F5F5F5">
+            <StackPanel DockPanel.Dock="Top" Margin="10">
+                <Button Content="Новый проект" Height="30" Margin="0,0,0,10" Click="CreateProject_Click"/>
+                <TextBlock Text="Проекты:" FontWeight="Bold" Margin="0,0,0,5"/>
+            </StackPanel>
+            <ListBox x:Name="ProjectsList" SelectionChanged="ProjectsList_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+
+        <!-- Правая панель с задачами -->
+        <DockPanel Grid.Column="1" Margin="10">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
+                <Button Content="Новая задача" Height="30" Width="100" Margin="0,0,10,0" Click="CreateTask_Click"/>
+                <Button Content="Экспорт в CSV" Height="30" Width="100" Margin="0,0,10,0" Click="ExportToCsv_Click"/>
+                <Button Content="Экспорт в PDF" Height="30" Width="100" Click="ExportToPdf_Click"/>
+            </StackPanel>
+            
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Сортировать по: " VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="1" x:Name="SortComboBox" Width="150" HorizontalAlignment="Left" SelectionChanged="SortComboBox_SelectionChanged">
+                    <ComboBoxItem Content="Приоритету"/>
+                    <ComboBoxItem Content="Сроку выполнения"/>
+                </ComboBox>
+            </Grid>
+
+            <DataGrid x:Name="TasksGrid" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="*"/>
+                    <DataGridTextColumn Header="Срок" Binding="{Binding DueDate, StringFormat=d}" Width="100"/>
+                    <DataGridComboBoxColumn Header="Статус" 
+                                          SelectedItemBinding="{Binding Status}"
+                                          Width="100"/>
+                    <DataGridComboBoxColumn Header="Приоритет" 
+                                          SelectedItemBinding="{Binding Priority}"
+                                          Width="100"/>
+                    <DataGridTextColumn Header="Исполнитель" 
+                                      Binding="{Binding AssignedTo.Name}" 
+                                      Width="150"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+    </Grid>
+</Window>
