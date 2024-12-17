@@ -10,10 +10,19 @@
         "dependencies": {
           "CsvHelper": "30.0.1",
           "Microsoft.Data.Sqlite": "7.0.0",
-          "itext7": "8.0.2"
+          "itext7": "8.0.2",
+          "itext7.bouncy-castle-adapter": "8.0.2"
         },
         "runtime": {
           "ProjectManager.dll": {}
+        }
+      },
+      "BouncyCastle.Cryptography/2.2.1": {
+        "runtime": {
+          "lib/net6.0/BouncyCastle.Cryptography.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.2.1.47552"
+          }
         }
       },
       "CsvHelper/30.0.1": {
@@ -85,6 +94,18 @@
           }
         }
       },
+      "itext.bouncy-castle-adapter/8.0.2": {
+        "dependencies": {
+          "BouncyCastle.Cryptography": "2.2.1",
+          "itext.commons": "8.0.2"
+        },
+        "runtime": {
+          "lib/netstandard2.0/itext.bouncy-castle-adapter.dll": {
+            "assemblyVersion": "8.0.2.0",
+            "fileVersion": "8.0.2.0"
+          }
+        }
+      },
       "itext.commons/8.0.2": {
         "dependencies": {
           "Microsoft.Extensions.Logging": "5.0.0",
@@ -100,6 +121,11 @@
       "itext7/8.0.2": {
         "dependencies": {
           "itext": "8.0.2"
+        }
+      },
+      "itext7.bouncy-castle-adapter/8.0.2": {
+        "dependencies": {
+          "itext.bouncy-castle-adapter": "8.0.2"
         }
       },
       "Microsoft.Data.Sqlite/7.0.0": {
@@ -907,6 +933,13 @@
       "serviceable": false,
       "sha512": ""
     },
+    "BouncyCastle.Cryptography/2.2.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-A6Zr52zVqJKt18ZBsTnX0qhG0kwIQftVAjLmszmkiR/trSp8H+xj1gUOzk7XHwaKgyREMSV1v9XaKrBUeIOdvQ==",
+      "path": "bouncycastle.cryptography/2.2.1",
+      "hashPath": "bouncycastle.cryptography.2.2.1.nupkg.sha512"
+    },
     "CsvHelper/30.0.1": {
       "type": "package",
       "serviceable": true,
@@ -921,6 +954,13 @@
       "path": "itext/8.0.2",
       "hashPath": "itext.8.0.2.nupkg.sha512"
     },
+    "itext.bouncy-castle-adapter/8.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-djCnycEdSBcpRxPOm0vAwGiOBZRT6GX7kyg/Jezk0AsMuq2d6Qd4md8AzTcgnEaTLwc717QK6QVmzbT30wdG7w==",
+      "path": "itext.bouncy-castle-adapter/8.0.2",
+      "hashPath": "itext.bouncy-castle-adapter.8.0.2.nupkg.sha512"
+    },
     "itext.commons/8.0.2": {
       "type": "package",
       "serviceable": true,
@@ -934,6 +974,13 @@
       "sha512": "sha512-IuFfSlMSTLqVGCIsxpcDL9kCtEfppSBjq4V+RgfrxnqEC+iNF4tCHiIdl8quyzTDbaHF4vNufxe2NXMJMkPlSw==",
       "path": "itext7/8.0.2",
       "hashPath": "itext7.8.0.2.nupkg.sha512"
+    },
+    "itext7.bouncy-castle-adapter/8.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-cNtEkxFStPblWys1uhafXkUuSGFAH9vFqZ4H09IZPMo5TzJbjbeklgmBGrFu7IPHtOym03+1RHzVEKzfcd1deQ==",
+      "path": "itext7.bouncy-castle-adapter/8.0.2",
+      "hashPath": "itext7.bouncy-castle-adapter.8.0.2.nupkg.sha512"
     },
     "Microsoft.Data.Sqlite/7.0.0": {
       "type": "package",

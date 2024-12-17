@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Study\\Code\\Alex\\Project\\ProjectManager.csproj": {}
+    "d:\\Study\\Code\\Alex\\Project\\ProjectManager.csproj": {}
   },
   "projects": {
-    "D:\\Study\\Code\\Alex\\Project\\ProjectManager.csproj": {
+    "d:\\Study\\Code\\Alex\\Project\\ProjectManager.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Study\\Code\\Alex\\Project\\ProjectManager.csproj",
+        "projectUniqueName": "d:\\Study\\Code\\Alex\\Project\\ProjectManager.csproj",
         "projectName": "ProjectManager",
-        "projectPath": "D:\\Study\\Code\\Alex\\Project\\ProjectManager.csproj",
+        "projectPath": "d:\\Study\\Code\\Alex\\Project\\ProjectManager.csproj",
         "packagesPath": "C:\\Users\\enter\\.nuget\\packages\\",
-        "outputPath": "D:\\Study\\Code\\Alex\\Project\\obj\\",
+        "outputPath": "d:\\Study\\Code\\Alex\\Project\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\enter\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -53,6 +53,10 @@
               "version": "[7.0.0, )"
             },
             "itext7": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "itext7.bouncy-castle-adapter": {
               "target": "Package",
               "version": "[8.0.2, )"
             }

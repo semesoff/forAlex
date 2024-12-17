@@ -37,6 +37,9 @@ namespace ProjectManager.Models
                 _ => Priority.ToString()
             };
         }
+
+        public string StatusDisplay => GetStatusDisplay();
+        public string PriorityDisplay => GetPriorityDisplay();
     }
 
     public enum TaskStatus

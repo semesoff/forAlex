@@ -257,6 +257,7 @@ namespace ProjectManager
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Ошибка при создании PDF: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Console.WriteLine($"PDF Export Error: {ex}"); // Добавление логирования ошибки
                 }
             }
         }

@@ -90,10 +90,10 @@
                     <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="*"/>
                     <DataGridTextColumn Header="Срок" Binding="{Binding DueDate, StringFormat=d}" Width="100"/>
                     <DataGridTextColumn Header="Статус" 
-                                      Binding="{Binding GetStatusDisplay}" 
+                                      Binding="{Binding StatusDisplay}" 
                                       Width="100"/>
                     <DataGridTextColumn Header="Приоритет" 
-                                      Binding="{Binding GetPriorityDisplay}" 
+                                      Binding="{Binding PriorityDisplay}" 
                                       Width="100"/>
                     <DataGridTextColumn Header="Исполнитель" 
                                       Binding="{Binding AssignedTo.Name}" 

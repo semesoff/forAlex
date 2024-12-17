@@ -4,16 +4,16 @@
 winexe
 C#
 .cs
-D:\Study\Code\Alex\Project\obj\Debug\net8.0-windows\
+d:\Study\Code\Alex\Project\obj\Debug\net8.0-windows\
 ProjectManager
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
-D:\Study\Code\Alex\Project\App.xaml
+d:\Study\Code\Alex\Project\App.xaml
 51172303304
 
 101776593216
-2231660570234
+225-416370602
 MainWindow.xaml;Views\ProjectDialog.xaml;Views\TaskDialog.xaml;Views\TeamMemberDialog.xaml;Views\TeamMembersListDialog.xaml;
 
 False

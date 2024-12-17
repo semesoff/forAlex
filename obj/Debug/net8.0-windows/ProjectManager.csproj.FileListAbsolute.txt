@@ -74,3 +74,5 @@ D:\Study\Code\Alex\Project\obj\Debug\net8.0-windows\refint\ProjectManager.dll
 D:\Study\Code\Alex\Project\obj\Debug\net8.0-windows\ProjectManager.pdb
 D:\Study\Code\Alex\Project\obj\Debug\net8.0-windows\ProjectManager.genruntimeconfig.cache
 D:\Study\Code\Alex\Project\obj\Debug\net8.0-windows\ref\ProjectManager.dll
+d:\Study\Code\Alex\Project\bin\Debug\net8.0-windows\BouncyCastle.Cryptography.dll
+d:\Study\Code\Alex\Project\bin\Debug\net8.0-windows\itext.bouncy-castle-adapter.dll
