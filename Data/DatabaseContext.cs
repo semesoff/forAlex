@@ -29,9 +29,7 @@ namespace ProjectManager.Data
                 CREATE TABLE IF NOT EXISTS Projects (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Name TEXT NOT NULL,
-                    Description TEXT,
-                    StartDate TEXT NOT NULL,
-                    EndDate TEXT NOT NULL
+                    Description TEXT
                 )";
             command.ExecuteNonQuery();
 
@@ -70,13 +68,11 @@ namespace ProjectManager.Data
 
             var command = connection.CreateCommand();
             command.CommandText = @"
-                INSERT INTO Projects (Name, Description, StartDate, EndDate)
-                VALUES (@name, @description, @startDate, @endDate)";
+                INSERT INTO Projects (Name, Description)
+                VALUES (@name, @description)";
             
             command.Parameters.AddWithValue("@name", project.Name);
             command.Parameters.AddWithValue("@description", project.Description);
-            command.Parameters.AddWithValue("@startDate", project.StartDate.ToString("s"));
-            command.Parameters.AddWithValue("@endDate", project.EndDate.ToString("s"));
             
             command.ExecuteNonQuery();
             
@@ -93,14 +89,12 @@ namespace ProjectManager.Data
             var command = connection.CreateCommand();
             command.CommandText = @"
                 UPDATE Projects 
-                SET Name = @name, Description = @description, StartDate = @startDate, EndDate = @endDate
+                SET Name = @name, Description = @description
                 WHERE Id = @id";
             
             command.Parameters.AddWithValue("@id", project.Id);
             command.Parameters.AddWithValue("@name", project.Name);
             command.Parameters.AddWithValue("@description", project.Description);
-            command.Parameters.AddWithValue("@startDate", project.StartDate.ToString("s"));
-            command.Parameters.AddWithValue("@endDate", project.EndDate.ToString("s"));
             
             command.ExecuteNonQuery();
         }
@@ -253,9 +247,7 @@ namespace ProjectManager.Data
                 {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
-                    Description = reader.GetString(2),
-                    StartDate = DateTime.Parse(reader.GetString(3)),
-                    EndDate = DateTime.Parse(reader.GetString(4))
+                    Description = reader.GetString(2)
                 });
             }
 

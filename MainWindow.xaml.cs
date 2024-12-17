@@ -14,6 +14,8 @@ using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
+using iText.Kernel.Font;
+using iText.IO.Font;
 
 namespace ProjectManager
 {
@@ -204,14 +206,19 @@ namespace ProjectManager
                     using var pdf = new PdfDocument(writer);
                     using var document = new Document(pdf);
 
+                    PdfFont font = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA);
+                    font.SetSubset(false);
+                    
                     // Добавляем заголовок
-                    var title = new Paragraph($"Отчет по проекту: {_selectedProject.Name}")
+                    var title = new Paragraph($"Отчет по проекту: {_selectedProject?.Name ?? "Неизвестный проект"}")
+                        .SetFont(font)
                         .SetFontSize(16)
                         .SetBold();
                     document.Add(title);
 
                     // Добавляем дату создания отчета
                     document.Add(new Paragraph($"Дата создания отчета: {DateTime.Now:g}")
+                        .SetFont(font)
                         .SetFontSize(10)
                         .SetItalic());
 
@@ -226,22 +233,30 @@ namespace ProjectManager
                     foreach (var header in headers)
                     {
                         var cell = new Cell()
-                            .Add(new Paragraph(header))
+                            .Add(new Paragraph(header).SetFont(font))
                             .SetBold()
                             .SetBackgroundColor(new iText.Kernel.Colors.DeviceRgb(240, 240, 240));
                         table.AddCell(cell);
                     }
 
-                    // Добавляем данные
-                    foreach (Task task in TasksGrid.ItemsSource)
+                    // Проверка наличия задач
+                    if (TasksGrid.ItemsSource is IEnumerable<Task> tasks && tasks.Any())
                     {
-                        table.AddCell(new Cell().Add(new Paragraph(task.Title)));
-                        table.AddCell(new Cell().Add(new Paragraph(task.DueDate.ToString("d"))));
-                        table.AddCell(new Cell().Add(new Paragraph(task.GetStatusDisplay())));
-                        table.AddCell(new Cell().Add(new Paragraph(task.GetPriorityDisplay())));
-                        table.AddCell(new Cell().Add(new Paragraph(task.AssignedTo?.Name ?? "Не назначен")));
+                        // Добавляем данные
+                        foreach (var task in tasks)
+                        {
+                            table.AddCell(new Cell().Add(new Paragraph(task.Title ?? "").SetFont(font).SetFontSize(12)));
+                            table.AddCell(new Cell().Add(new Paragraph(task.DueDate.ToString("dd.MM.yyyy") ?? "").SetFont(font).SetFontSize(12)));
+                            table.AddCell(new Cell().Add(new Paragraph(task.GetStatusDisplay() ?? "").SetFont(font).SetFontSize(12)));
+                            table.AddCell(new Cell().Add(new Paragraph(task.GetPriorityDisplay() ?? "").SetFont(font).SetFontSize(12)));
+                            table.AddCell(new Cell().Add(new Paragraph(task.AssignedTo?.Name ?? "Не назначен").SetFont(font).SetFontSize(12)));
+                        }
                     }
-
+                    else
+                    {
+                        document.Add(new Paragraph("Нет задач для отображения").SetFont(font).SetFontSize(12));
+                    }
+                    
                     document.Add(table);
                     document.Close();
 
