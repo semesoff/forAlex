@@ -16,6 +16,7 @@ using iText.Layout.Element;
 using iText.Layout.Properties;
 using iText.Kernel.Font;
 using iText.IO.Font;
+using iText.IO.Font.Constants;
 
 namespace ProjectManager
 {
@@ -206,8 +207,7 @@ namespace ProjectManager
                     using var pdf = new PdfDocument(writer);
                     using var document = new Document(pdf);
 
-                    PdfFont font = PdfFontFactory.CreateFont(iText.IO.Font.Constants.StandardFonts.HELVETICA);
-                    font.SetSubset(false);
+                    PdfFont font = PdfFontFactory.CreateFont("c:/windows/fonts/arial.ttf", PdfEncodings.IDENTITY_H);
                     
                     // Добавляем заголовок
                     var title = new Paragraph($"Отчет по проекту: {_selectedProject?.Name ?? "Неизвестный проект"}")
