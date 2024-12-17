@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -181,29 +182,6 @@ namespace ProjectManager
             }
         }
 
-        private void ExportToCsv_Click(object sender, RoutedEventArgs e)
-        {
-            if (_selectedProject == null || TasksGrid.ItemsSource == null)
-            {
-                MessageBox.Show("Нет данных для экспорта", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            var saveFileDialog = new SaveFileDialog
-            {
-                Filter = "CSV files (*.csv)|*.csv",
-                FileName = $"{_selectedProject.Name}_tasks.csv"
-            };
-
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                using var writer = new StreamWriter(saveFileDialog.FileName);
-                using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                csv.WriteRecords(TasksGrid.ItemsSource);
-                MessageBox.Show("Экспорт в CSV выполнен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-        }
-
         private void ExportToPdf_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedProject == null || TasksGrid.ItemsSource == null)
@@ -279,6 +257,37 @@ namespace ProjectManager
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Ошибка при создании PDF: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void ExportToCsv_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedProject == null || TasksGrid.ItemsSource == null)
+            {
+                MessageBox.Show("Нет данных для экспорта", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "CSV files (*.csv)|*.csv",
+                FileName = $"{_selectedProject.Name}_tasks.csv"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    using var writer = new StreamWriter(saveFileDialog.FileName, false, System.Text.Encoding.UTF8);
+                    using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                    csv.WriteRecords((IEnumerable<Task>)TasksGrid.ItemsSource);
+
+                    MessageBox.Show("Экспорт в CSV выполнен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при создании CSV: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
