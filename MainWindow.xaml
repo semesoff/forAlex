@@ -89,8 +89,12 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="*"/>
                     <DataGridTextColumn Header="Срок" Binding="{Binding DueDate, StringFormat=d}" Width="100"/>
-                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="100"/>
-                    <DataGridTextColumn Header="Приоритет" Binding="{Binding Priority}" Width="100"/>
+                    <DataGridTextColumn Header="Статус" 
+                                      Binding="{Binding GetStatusDisplay}" 
+                                      Width="100"/>
+                    <DataGridTextColumn Header="Приоритет" 
+                                      Binding="{Binding GetPriorityDisplay}" 
+                                      Width="100"/>
                     <DataGridTextColumn Header="Исполнитель" 
                                       Binding="{Binding AssignedTo.Name}" 
                                       Width="150"/>

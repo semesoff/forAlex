@@ -13,6 +13,30 @@ namespace ProjectManager.Models
         public int ProjectId { get; set; }
         public int? AssignedToId { get; set; }
         public TeamMember AssignedTo { get; set; }
+
+        // Метод для получения отображаемого текста статуса
+        public string GetStatusDisplay()
+        {
+            return Status switch
+            {
+                TaskStatus.Pending => "Ожидает",
+                TaskStatus.InProgress => "В процессе",
+                TaskStatus.Completed => "Завершено",
+                _ => Status.ToString()
+            };
+        }
+
+        // Метод для получения отображаемого текста приоритета
+        public string GetPriorityDisplay()
+        {
+            return Priority switch
+            {
+                TaskPriority.Low => "Низкий",
+                TaskPriority.Medium => "Средний",
+                TaskPriority.High => "Высокий",
+                _ => Priority.ToString()
+            };
+        }
     }
 
     public enum TaskStatus

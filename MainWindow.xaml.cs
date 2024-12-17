@@ -12,6 +12,7 @@ using CsvHelper;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
+using iText.Layout.Properties;
 
 namespace ProjectManager
 {
@@ -219,32 +220,66 @@ namespace ProjectManager
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                using var writer = new PdfWriter(saveFileDialog.FileName);
-                using var pdf = new PdfDocument(writer);
-                var document = new Document(pdf);
-
-                document.Add(new Paragraph($"Проект: {_selectedProject.Name}"));
-                document.Add(new Paragraph($"Отчет создан: {DateTime.Now:g}"));
-                document.Add(new Paragraph("\n"));
-
-                var table = new Table(5);
-                table.AddCell("Название");
-                table.AddCell("Срок");
-                table.AddCell("Статус");
-                table.AddCell("Приоритет");
-                table.AddCell("Исполнитель");
-
-                foreach (Task task in TasksGrid.ItemsSource)
+                try
                 {
-                    table.AddCell(task.Title);
-                    table.AddCell(task.DueDate.ToString("d"));
-                    table.AddCell(task.Status.ToString());
-                    table.AddCell(task.Priority.ToString());
-                    table.AddCell(task.AssignedTo?.Name ?? "Не назначен");
-                }
+                    using var writer = new PdfWriter(saveFileDialog.FileName);
+                    using var pdf = new PdfDocument(writer);
+                    using var document = new Document(pdf);
 
-                document.Add(table);
-                MessageBox.Show("Экспорт в PDF выполнен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // Добавляем заголовок
+                    var title = new Paragraph($"Отчет по проекту: {_selectedProject.Name}")
+                        .SetFontSize(16)
+                        .SetBold();
+                    document.Add(title);
+
+                    // Добавляем дату создания отчета
+                    document.Add(new Paragraph($"Дата создания отчета: {DateTime.Now:g}")
+                        .SetFontSize(10)
+                        .SetItalic());
+
+                    document.Add(new Paragraph("\n"));
+
+                    // Создаем таблицу с фиксированной шириной столбцов
+                    var table = new Table(5);
+                    table.SetWidth(500); // Фиксированная ширина таблицы
+
+                    // Добавляем заголовки
+                    string[] headers = { "Название", "Срок", "Статус", "Приоритет", "Исполнитель" };
+                    foreach (var header in headers)
+                    {
+                        var cell = new Cell()
+                            .Add(new Paragraph(header))
+                            .SetBold()
+                            .SetBackgroundColor(new iText.Kernel.Colors.DeviceRgb(240, 240, 240));
+                        table.AddCell(cell);
+                    }
+
+                    // Добавляем данные
+                    foreach (Task task in TasksGrid.ItemsSource)
+                    {
+                        table.AddCell(new Cell().Add(new Paragraph(task.Title)));
+                        table.AddCell(new Cell().Add(new Paragraph(task.DueDate.ToString("d"))));
+                        table.AddCell(new Cell().Add(new Paragraph(task.GetStatusDisplay())));
+                        table.AddCell(new Cell().Add(new Paragraph(task.GetPriorityDisplay())));
+                        table.AddCell(new Cell().Add(new Paragraph(task.AssignedTo?.Name ?? "Не назначен")));
+                    }
+
+                    document.Add(table);
+                    document.Close();
+
+                    MessageBox.Show("Экспорт в PDF выполнен успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // Открываем файл после создания
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = saveFileDialog.FileName,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при создании PDF: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
     }
