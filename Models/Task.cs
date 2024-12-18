@@ -2,7 +2,7 @@ using System;
 
 namespace ProjectManager.Models
 {
-    public class Task
+    public class Task : BaseEntity
     {
         public int Id { get; set; }
         public string Title { get; set; }

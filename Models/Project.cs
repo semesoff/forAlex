@@ -3,11 +3,23 @@ using System.Collections.Generic;
 
 namespace ProjectManager.Models
 {
-    public class Project
+    public class Project : BaseEntity
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        private string name;
+        private string description;
+
+        public string Name
+        {
+            get => name;
+            set => name = value;
+        }
+
+        public string Description
+        {
+            get => description;
+            set => description = value;
+        }
+
         public List<Task> Tasks { get; set; } = new List<Task>();
     }
 }
